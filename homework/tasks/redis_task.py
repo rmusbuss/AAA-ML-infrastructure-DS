@@ -19,7 +19,7 @@ class UsersByTitleStorage:
         """
         # YOUR CODE GOES HERE
         async with self._client.pipeline(transaction=True) as pipe:
-            await (pipe.set(title, user_id).execute())
+            await (pipe.sadd(title, user_id).execute())
 
     async def find_users_by_title(self, title: str) -> list[int]:
         """
@@ -27,4 +27,4 @@ class UsersByTitleStorage:
         с заданным title.
         """
         # YOUR CODE GOES HERE
-        return await self._client.get(title)
+        return await self._client.smembers(title)
