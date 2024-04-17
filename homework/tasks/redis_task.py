@@ -27,4 +27,4 @@ class UsersByTitleStorage:
         с заданным title.
         """
         # YOUR CODE GOES HERE
-        return await self._client.smembers(title)
+        return await self._client.smembers(title).decode()
