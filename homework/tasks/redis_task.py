@@ -28,4 +28,5 @@ class UsersByTitleStorage:
         с заданным title.
         """
         # YOUR CODE GOES HERE
-        return await self._client.smembers(title)
+        result = await self._client.smembers(title)
+        return list(map(int, result))
