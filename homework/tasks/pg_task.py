@@ -67,7 +67,7 @@ class ItemStorage:
                 temp_list.append(getattr(item, field))
             fields_list.append(tuple(temp_list))
 
-        return await self._pool.executemany('''
+        await self._pool.executemany('''
                 INSERT INTO items VALUES 
                         ($1, $2, $3, $4)''', fields_list)
         
@@ -78,11 +78,11 @@ class ItemStorage:
         Напишите код для поиска записей, имеющих указанные user_id, title и description.
         """
         # YOUR CODE GOES HERE
-        await self._pool.fetch('''
+        return await self._pool.fetch('''
                 SELECT * FROM items
                 WHERE 1=1
                       AND user_id = $1
                       AND title = $2
                       AND description = $3
-                              ''', 
-            [user_id, title, description])
+                              ''',
+        [user_id, title, description])
