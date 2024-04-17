@@ -57,9 +57,19 @@ class ItemStorage:
         # sql injections https://habr.com/ru/articles/148151/.
         # YOUR CODE GOES HERE
         # con = await asyncpg.connect(user='postgres')
+        fields = ['item_id', 'user_id', 'title',  'description']
+        fields_list = []
+
+        for item in items:
+            temp_list = []
+            for field in fields:
+                # fields_dict[field].append(getattr(item,field))
+                temp_list.append(getattr(item, field))
+            fields_list.append(tuple(temp_list))
+
         return await self._pool.executemany('''
                 INSERT INTO items VALUES 
-                        ($1, $2, $3, $4)''', items)
+                        ($1, $2, $3, $4)''', fields_list)
         
     async def find_similar_items(
         self, user_id: int, title: str, description: str
