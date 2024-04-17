@@ -2,6 +2,8 @@ import abc
 
 import httpx
 
+import time
+
 
 class ResultsObserver(abc.ABC):
     @abc.abstractmethod
@@ -21,10 +23,31 @@ async def do_reliable_request(url: str, observer: ResultsObserver) -> None:
 
     async with httpx.AsyncClient() as client:
         # YOUR CODE GOES HERE
-        response = await client.get(url)
-        response.raise_for_status()
-        data = response.read()
-
-        observer.observe(data)
+        retry_limit = 5
+        while retry_limit > 0:
+            try:
+                response = await client.get(url, timeout=11)
+                status = response.status_code
+                if status // 100 == 2:
+                    data = response.read()
+                    observer.observe(data)
+                    return
+                elif status // 100 == 5:
+                    retry_limit -= 1
+                    time.sleep(0.1)
+                    continue
+                elif status // 100 == 4:
+                    retry_limit = 0
+                    print('Wrong data. Check the input')
+            except httpx.TimeoutException:
+                print("Service doesn't Respond")
+                print(f'Retrying {6 - retry_limit} time')
+                retry_limit -= 1
+                time.sleep(0.5)
+        # response.raise_for_status()
         return
+        # data = response.read()
+
+        # observer.observe(data)
+        # return
         #####################

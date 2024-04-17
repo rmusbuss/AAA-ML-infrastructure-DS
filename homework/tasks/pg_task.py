@@ -38,6 +38,15 @@ class ItemStorage:
         # In production environment we will use migration tool
         # like https://github.com/pressly/goose
         # YOUR CODE GOES HERE
+        # con = await asyncpg.connect(user='postgres')
+        await self._pool.execute('''
+                CREATE TABLE items (
+                    item_id bigint primary key,
+                    user_id bigint not null,
+                    title text not null, 
+                    description text not null
+                );
+        ''')
 
     async def save_items(self, items: list[ItemEntry]) -> None:
         """
@@ -47,7 +56,11 @@ class ItemStorage:
         # Don't use str-formatting, query args should be escaped to avoid
         # sql injections https://habr.com/ru/articles/148151/.
         # YOUR CODE GOES HERE
-
+        # con = await asyncpg.connect(user='postgres')
+        return await self._pool.executemany('''
+                INSERT INTO items VALUES 
+                        ($1, $2, $3, $4)''', items)
+        
     async def find_similar_items(
         self, user_id: int, title: str, description: str
     ) -> list[ItemEntry]:
@@ -55,3 +68,11 @@ class ItemStorage:
         Напишите код для поиска записей, имеющих указанные user_id, title и description.
         """
         # YOUR CODE GOES HERE
+        await self._pool.fetch('''
+                SELECT * FROM items
+                WHERE 1=1
+                      AND user_id = $1
+                      AND title = $2
+                      AND description = $3
+                              ''', 
+            [user_id, title, description])
