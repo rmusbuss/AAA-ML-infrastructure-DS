@@ -85,6 +85,6 @@ class ItemStorage:
                       AND title = $2
                       AND description = $3
                               ''',
-        [user_id, title, description])
+        *[user_id, title, description])
         print(f'{result=}')
         return [ItemEntry(**row) for row in result]
