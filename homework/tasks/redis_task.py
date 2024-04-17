@@ -3,7 +3,8 @@ import redis.asyncio as aredis
 
 class UsersByTitleStorage:
     def __init__(self):
-        self._client = aredis.StrictRedis()
+        # self._client = aredis.StrictRedis()
+        self._client = aredis.StrictRedis(decode_responses=True)
 
     async def connect(self) -> None:
         pass
@@ -27,4 +28,4 @@ class UsersByTitleStorage:
         с заданным title.
         """
         # YOUR CODE GOES HERE
-        return await self._client.smembers(title).decode()
+        return await self._client.smembers(title)
