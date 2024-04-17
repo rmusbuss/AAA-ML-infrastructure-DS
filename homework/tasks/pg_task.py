@@ -78,7 +78,7 @@ class ItemStorage:
         Напишите код для поиска записей, имеющих указанные user_id, title и description.
         """
         # YOUR CODE GOES HERE
-        return await self._pool.fetch('''
+        result = await self._pool.fetch('''
                 SELECT * FROM items
                 WHERE 1=1
                       AND user_id = $1
@@ -86,3 +86,4 @@ class ItemStorage:
                       AND description = $3
                               ''',
         [user_id, title, description])
+        return [ItemEntry(**row) for row in result]
