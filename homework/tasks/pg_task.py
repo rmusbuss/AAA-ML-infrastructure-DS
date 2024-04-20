@@ -74,7 +74,14 @@ class ItemStorage:
         # и теперь помещаем список кортежей значений в таблицу
         await self._pool.executemany('''
                 INSERT INTO items VALUES
-                        ($1, $2, $3, $4)''', fields_list)
+                    ($1, $2, $3, $4)''',
+                                     [
+                                      (item.item_id,
+                                       item.user_id,
+                                       item.title,
+                                       item.description)
+                                      for item in items
+                                     ])
 
     async def find_similar_items(
         self, user_id: int, title: str, description: str

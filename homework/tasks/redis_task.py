@@ -21,8 +21,7 @@ class UsersByTitleStorage:
         # YOUR CODE GOES HERE
         # добавляем по ключу title значение user_id
         # если не существует словаря, то создается новый
-        async with self._client.pipeline(transaction=True) as pipe:
-            await (pipe.sadd(title, user_id).execute())
+        await self._client.sadd(title, user_id)
 
     async def find_users_by_title(self, title: str) -> list[int]:
         """
