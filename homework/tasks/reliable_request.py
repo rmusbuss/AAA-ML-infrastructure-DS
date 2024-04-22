@@ -30,29 +30,20 @@ async def do_reliable_request(url: str, observer: ResultsObserver) -> None:
             try:
                 # включаем таймаут в 11 секунд (таймаут подстроен под тесты)
                 response = await client.get(url, timeout=11)
-                # получаем код ответа и в зависимости от типа ошибки делаем
-                # определенные действия
-                status = response.status_code
-                # если все ок, то регистрируем рез-ты с помощью обсервера
-                if status // 100 == 2:
-                    data = response.read()
-                    observer.observe(data)
-                    return
-                # если ошибка сервера пробуем еще
-                elif status // 100 == 5:
-                    retry_limit -= 1
-                    time.sleep(0.1)
-                    continue
-                # если ошибка на стороне клиента, то пишем, что
-                # он что-то не то передает
-                elif status // 100 == 4:
-                    retry_limit = 0
-                    print('Wrong data. Check the input')
+                # используем raise_for_status() для обработки ошибок в запросе
+                response.raise_for_status() 
+                data = response.read()
+                observer.observe(data)
+                return
             # если ошибка в таймауте, то мы ретраим и печатаем
             except httpx.TimeoutException:
                 print("Service doesn't Respond")
                 print(f'Retrying {6 - retry_limit} time')
                 retry_limit -= 1
                 time.sleep(0.5)
+            # если ошибка сервера или клиента, то мы ретраим и печатаем
+            except httpx.HTTPStatusError as exc:
+                print(f"HTTP error occurred: {exc}")
+                retry_limit -= 1
+                time.sleep(0.1)
         return
-        #####################
