@@ -56,20 +56,6 @@ class ItemStorage:
         # Don't use str-formatting, query args should be escaped to avoid
         # sql injections https://habr.com/ru/articles/148151/.
         # YOUR CODE GOES HERE
-        # обозначаем поля, которые в нашей таблице
-        fields = ['item_id', 'user_id', 'title',  'description']
-        fields_list = []
-
-        # итерируемся по каждой входящей строке (item)
-        # и дальше по очереди по каждому полю
-        for item in items:
-            temp_list = []
-            for field in fields:
-                # вытаскиваем из ItemEntry значение из поля и помещаем в list
-                temp_list.append(getattr(item, field))
-            # как только по очереди по всем полям пробежались
-            # переводим лист полей в tuple и его помещаем в list
-            fields_list.append(tuple(temp_list))
 
         # и теперь помещаем список кортежей значений в таблицу
         await self._pool.executemany('''
