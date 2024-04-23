@@ -3,7 +3,8 @@ import redis.asyncio as aredis
 
 class UsersByTitleStorage:
     def __init__(self):
-        self._client = aredis.StrictRedis()
+        # добавили decode_responses=True, чтобы приходили строки вместо байтов
+        self._client = aredis.StrictRedis(decode_responses=True)
 
     async def connect(self) -> None:
         pass
@@ -18,6 +19,9 @@ class UsersByTitleStorage:
         имеющих объявления с заданным заголовком.
         """
         # YOUR CODE GOES HERE
+        # добавляем по ключу title значение user_id
+        # если не существует словаря, то создается новый
+        await self._client.sadd(title, user_id)
 
     async def find_users_by_title(self, title: str) -> list[int]:
         """
@@ -25,3 +29,7 @@ class UsersByTitleStorage:
         с заданным title.
         """
         # YOUR CODE GOES HERE
+        # возвращаем список элементов по ключу в виде строки
+        result = await self._client.smembers(title)
+        # переводим элементы из строки в int, так как у нас user_id
+        return list(map(int, result))
